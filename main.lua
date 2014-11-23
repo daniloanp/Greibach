@@ -33,8 +33,10 @@ local validators = {
   ['character, character varying'] = {
     name = 'length',
     opts = {
-      max = function(dbType) return '1' end,
-      min = function(dbType) return '2' end
+      max = function(dbType) 
+        local num = string.match(dbType, '[0-9]+')
+        return tonumber(num)
+      end,
     }
   },
   ['text'] = {
@@ -63,10 +65,14 @@ while row do
 		psqlTables[row.table_name] = {}
 	end
 
+  local dataType = row.data_type ~= 'USER-DEFINED' and row.data_type or row.udt_name
+  if string.match(dataType, 'character') then -- Character must include their length as part of type
+    dataType = dataType.." ("..row.character_maximum_length..")"
+  end
+
 	table.insert(psqlTables[row.table_name], {
 		columnName = row.column_name,
-		dataType = row.data_type ~= 'USER-DEFINED' and row.data_type or row.udt_name
-
+		['dataType'] = dataType
 	})
 	
 	-- reusing the table of results
@@ -145,11 +151,11 @@ function rules (psqlTable)
   end
 
   for dbType, attrs in pairs(tp_columns) do
-    print(dbType)
     local validator = nil
     -- find validator (expensive in complexity, but small list)
     for tp, vl in pairs(validators) do
-      if string.match(tp, dbType) then
+      local matchType = string.match(dbType, '[%w_ ]*[%w_]')
+      if string.match(tp, matchType) then
         validator = vl
         break
       end
