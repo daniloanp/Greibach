@@ -74,7 +74,7 @@ while row do
 end
 
 function getEnumValues(enumName) -- returns a string
-  local cursor, errorString =  con:execute('SELECT e.enumlabel FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid  WHERE t.typname =\''..enumName.."';")  
+  local cursor, errorString =  con:execute('SELECT e.enumlabel FROM pg_enum e JOIN pg_type t ON e.enumtypid = t.oid  WHERE t.typname =\'' .. enumName .. "';")  
   local row = cursor:fetch ({}, "a")
 
   if not row then return nil end
@@ -84,11 +84,11 @@ function getEnumValues(enumName) -- returns a string
     if range ~= '[' then
       range = range .. ', '
     end
-    range = range .. "'"..row.enumlabel.."'"
+    range = range .. "'" .. row.enumlabel .. "'"
     row = cursor:fetch (row, "a")
   end
 
-  return range..']'
+  return range .. ']'
 end
 
 function getTranslateFileName( )
@@ -168,26 +168,26 @@ function rules (psqlTable)
       end
     end
     -- use validator
-    result = result .."            ['"..table.concat(attrs, ', ').."'"
-    result = result.. ", '"..validator.name.."'"
+    result = result .. "            ['" .. table.concat(attrs, ', ') .. "'"
+    result = result .. ", '" .. validator.name .. "'"
     if validator.opts ~= nil then
       for opt, val in pairs(validator.opts) do
-        result = result..", '"..opt.."' => "
+        result = result .. ", '" .. opt .. "' => "
         local valType = type(val)
         if valType == 'function' then
           val = val(dbType)
-          result = result..tostring(val)
+          result = result .. tostring(val)
         elseif opt == 'range' then
-          result = result..val
+          result = result .. val
         elseif valType == 'string' then
-          result = result.."'"..tostring(val).."'"
+          result = result .. "'" .. tostring(val) .. "'"
         else 
-          result = result..tostring(val)
+          result = result .. tostring(val)
         end
         
       end
     end
-    result = result..'],\n'    
+    result = result .. '],\n'  
   end 
 
   return result
