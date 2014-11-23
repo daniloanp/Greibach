@@ -203,13 +203,12 @@ function labels (psqlTable, translateFileName)
   for index, column in pairs(psqlTable) do
     result = result .. "            '" .. column.columnName .. "' => " 
     if translateFileName == nil then
-      result = result.."'"..string.gsub(column.columnName, "_", " ") .. "'\n"
+      result = result .. "'" .. string.gsub(column.columnName, "_", " ") .. "',\n"
     else
-      result = result.. "Yii::t('"..translateFileName.."', '"..string.gsub(column.columnName, "_", " ") .. "'),\n"
+      result = result .. "Yii::t('" .. translateFileName .. "', '" .. string.gsub(column.columnName, "_", " ") .. "'),\n"
     end
   end
-  result = string.sub(result, 0, -2)
-  return string.sub(result, 0, -2)
+  return string.sub(result, 0, -2) -- remove newline
 end
 
 function generateTableModel (tableName, psqlTable)
