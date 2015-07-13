@@ -12,7 +12,7 @@ local conf = {
   port      = 5432,
   -- PHP config
   baseParentClassName = 'MyActiveRecord',
-  translateFile       = nil, -- To do
+  translateFile       = '___translate__', -- To do
 }
 
 local con = assert (env:connect(conf.db, conf.user, conf.password, conf.host, conf.port))
@@ -134,8 +134,8 @@ function baseParentClassName ()
   return conf.baseParentClassName
 end
 
-function schemaPrefixAndTableName (psqlTable)
-  return "schemaPrefixAndTableName"
+function schemaPrefixAndTableName ()
+  return tableSchema .. '.' .. tableName
 end
 
 function rules (psqlTable)
@@ -222,7 +222,7 @@ function generateTableModel (tableName, psqlTable)
   local template = templateFile:read("*all")
   io.close(templateFile)
 
-  template = string.gsub(template, "__SCHEMAPREFIXANDTABLENAME__", schemaPrefixAndTableName(psqlTable))
+  template = string.gsub(template, "__SCHEMAPREFIXANDTABLENAME__", schemaPrefixAndTableName())
   template = string.gsub(template, "__HEADERCOLUMNLIST__", headerColumnList(psqlTable))
   template = string.gsub(template, "__HEADERRELATIONLIST__", headerRelationList(psqlTable))
   template = string.gsub(template, "__CLASSNAME__", className(tableName))
